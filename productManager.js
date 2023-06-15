@@ -28,7 +28,7 @@ class Product {
         }
 
         getProducts = () => {
-            console.log(readProducts);
+            console.log(this.products);
         }
 
         getProductById = (id) => {
