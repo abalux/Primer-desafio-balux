@@ -31,8 +31,8 @@ class Product {
         }
 
         getProducts = () => {
-            JSON.parse(fs.readFileSync('./products.json'));
-            console.log(this.products);
+            const readProducts = JSON.parse(fs.readFileSync('./products.json'));
+            console.log(readProducts)
         }
 
         getProductById = (id) => {
