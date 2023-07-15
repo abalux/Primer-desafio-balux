@@ -33,13 +33,20 @@ class Product {
         getProducts = () => {
             const readProducts = JSON.parse(fs.readFileSync('./products.json'));
             console.log(readProducts)
+            return readProducts;
         }
 
         getProductById = (id) => {
             this.getProducts();
-            const productFound = this.products.find(p => p.id === id);
-            productFound ? console.log(productFound) : console.error("Ese id no existe");
+            const productFound = this.products.find(p => p.id === Number(id));
+            if (productFound){
+                console.log(productFound)
+                return productFound;
+            }else{
+                return "No se encontro un producto con ese id";
+            }
         }
+    
 
         updateProduct = (id, title, description, price, thumbnail, code, stock) => {
             this.getProducts();
@@ -57,13 +64,13 @@ class Product {
     }
 
       //testeo
-    let manager = new ProductManager();
-    let productA = new Product("Producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
+    export const manager = new ProductManager();
+    const productA = new Product("Producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
     manager.getProducts();
     manager.addProduct(productA);
     manager.getProducts();
     manager.getProductById(1);
-    let productB = new Product("Producto prueba b ", "Este es un producto prueba b ", 200, "Sin imagen", "abc124", 25);
+    const productB = new Product("Producto prueba b ", "Este es un producto prueba b ", 200, "Sin imagen", "abc124", 25);
     manager.addProduct(productB);
     manager.getProducts();
     manager.deleteProduct(1);
