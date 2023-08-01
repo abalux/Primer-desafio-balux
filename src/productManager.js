@@ -69,7 +69,7 @@ class ProductManager {
 
 
 //testeo
-export const manager = new ProductManager();
+export const manager = new ProductManager();/*
 const productA = new Product("Producto prueba", "Este es un producto prueba", 200, "Sin imagen", "abc123", 25);
 manager.getProducts();
 manager.addProduct(productA);
@@ -81,4 +81,4 @@ manager.getProducts();
 manager.deleteProduct(1);
 manager.getProducts();
 manager.updateProduct(2,"Producto prueba b ", "Este es un producto prueba b ", 400, "Sin imagen", "abc124", 25);
-manager.getProducts();
+manager.getProducts(); */
