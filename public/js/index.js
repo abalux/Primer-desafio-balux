@@ -1,0 +1,105 @@
+const socket = io();
+
+socket.emit("connection", "nuevo cliente conectado");
+
+
+
+document.getElementById("productForm").addEventListener('submit', (event) => {
+  event.preventDefault();
+
+
+  const productId = document.getElementById("productId").value;
+  const productTitle = document.getElementById("productTitle").value;
+  const productDescription = document.getElementById("productDescription").value;
+  const productPrice = document.getElementById("productPrice").value;
+  const productCode = document.getElementById("productCode").value;
+  const productStock = document.getElementById("productStock").value;
+
+
+
+  console.log(
+    "Nuevo producto agregado:",
+    productId,
+    productTitle,
+    productDescription,
+    productPrice,
+    productCode,
+    productStock,    
+  );
+
+   // Enviar el producto al servidor a través del socket
+  socket.emit("agregarProducto", {
+    id:productId,
+    title: productTitle,
+    description: productDescription,
+    price: productPrice,
+    code:productCode,
+    stock:productStock,
+  });
+
+  // Limpiar el campo del formulario
+  document.getElementById("productId").value = "";
+  document.getElementById("productTitle").value = "";
+  document.getElementById("productDescription").value = "";
+  document.getElementById("productPrice").value = "";
+  document.getElementById("productCode").value = "";
+  document.getElementById("productStock").value = "";
+
+
+  location.reload();
+
+
+})
+
+// Obtener la lista de productos inicial desde el servidor
+socket.on("initialProductList", (productList) => {
+  updateProductList(productList);
+
+  
+});
+
+
+// Agregar un nuevo producto a la lista
+socket.on("nuevoProductoAgregado", (newProduct) => {
+  const productList = document.getElementById("productList");
+  const li = document.createElement("li");
+  li.textContent = newProduct.title;
+
+  productList.appendChild(li);
+});
+
+
+
+// Actualizar la lista de productos
+function updateProductList(products) {
+  const productList = document.getElementById("productList");
+  productList.innerHTML = "";
+
+  products.forEach((product) => {
+    const div = document.createElement("div");
+    div.innerHTML = `
+    
+      <p>Id: ${product.id}</p>
+      <p>Título: ${product.title}</p>
+      <p>Descripción: ${product.description}</p>
+      <p>Precio: ${product.price}</p>
+      <p>Código: ${product.code}</p>
+      <p>Stock: ${product.stock}</p>
+      <button class="eliminarBtn" data-product-id="{{this.id}}">Eliminar</button>
+    `;
+
+          
+    productList.appendChild(div);
+  });
+
+}
+
+document.addEventListener('click', (event) => {
+  if (event.target.classList.contains('eliminarBtn')) {
+    const productoId = event.target.dataset.productId;
+    console.log('ID del producto:', productoId);
+
+    socket.emit('eliminarProducto', productoId);
+    location.reload();
+  }
+});

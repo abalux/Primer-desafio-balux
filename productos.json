@@ -1,0 +1,26 @@
+[
+    {
+    "title": "Producto 1",
+    "price": 100,
+    "description": "Este es un producto 1",
+    "code": "abc123",
+    "stock": 20,
+    "id": 1
+    },
+    {
+    "title": "Producto 2",
+    "price": 200,
+    "description": "Este es un producto 2",
+    "code": "abc124",
+    "stock": 20,
+    "id": 2
+    },
+    {
+    "title": "Producto 3",
+    "price": 300,
+    "description": "Este es un producto 3",
+    "code": "abc125",
+    "stock": 30,
+    "id": 3
+    }
+]

@@ -20,9 +20,15 @@
   "homepage": "https://github.com/abalux/primer-desafio-balux#readme",
   "dependencies": {
     "express": "^4.18.2",
-    "nodemon": "^3.0.1"
+    "express-handlebars": "^7.1.2",
+    "nodemon": "^3.0.1",
+    "socket.io": "^4.7.2"
   },
   "nodemonConfig": {
-    "ignore": ["products.json", "carrito.json", "node_modules"]
+    "ignore": [
+      "products.json",
+      "carrito.json",
+      "node_modules"
+    ]
   }
 }
