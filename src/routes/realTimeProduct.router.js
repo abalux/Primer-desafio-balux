@@ -1,17 +1,11 @@
 import { Router } from "express";
+import { getProducts } from "../dao/dbManagers/productManager.js";
 
-import { __filename, __dirname } from "../utils.js";
-import {
-    obtenerListaDeProductos,
-    guardarProducto,
-} from "../services/productUtils.js";
+const router = Router()
 
-const realtimeRouter = Router();
+router.get("/", async (req, res) => {
+    const products = await getProducts()
+    res.render("realTimeProducts", {products})
+})
 
-realtimeRouter.get("/", (req, res) => {
-    const products = obtenerListaDeProductos();
-
-    res.render("realtimeproducts", { products });
-});
-
-export default realtimeRouter;
+export default router;

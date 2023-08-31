@@ -1,9 +1,18 @@
 <div>
-    <h1>Lista de productos</h1>
+    <h1 class="title">Lista de productos</h1>
     <ul id="productList">
         {{#each products}}
             <li>
-                <p>{{title}}</p>
+                <h2>
+                    {{prop this 'title'}}
+                </h2>
+                <div class="description">
+                    <p><span>Description:</span> {{prop this 'description'}}</p>
+                </div>
+                <div class="price-stock">
+                    <p><span>Price:</span> ${{prop this 'price'}}</p>
+                    <p><span>Stock:</span> {{prop this 'stock'}}</p>
+                </div>
             </li>
         {{/each}}
     </ul>

@@ -1,25 +1,50 @@
-import express from "express";
-import { cartManager } from "../cartManager.js";
+import { Router } from "express";
+import cartsModels from "../dao/models/carts.models.js";
+import { addCart, getCart, getCartById, addProductToCart } from "../dao/dbManagers/cartManager.js";
 
-const cartsRouter = express.Router();
 
-cartsRouter.post('/guardar', async(req, res)=>{
-    const cart = req.body;
-    await cartManager.createCarts(cart);
-    res.send(cart);
+const router = Router()
+
+router.get("/", async (req, res) => {
+    try{
+        const response = await getCart()
+        res.json({message: "success", data: response})
+    }
+    catch(err) {
+        res.status(500).json({message: "algo salió mal al traer los carritos :(", error: err})
+    }
 })
 
-cartsRouter.get('/:cid', async(req, res)=>{
-    const cid = parseInt(req.params['cid']);
-    const idFound = await cartManager.getCartById(cid)
-    res.send(idFound);
+router.get("/:cid", async (req, res) => {
+    try{
+        const {cid} = req.params
+        const response = await getCartById(cid)
+        res.json({message: "success al traer el carrito por ID", data: response})
+    }
+    catch(err) {
+        res.status(500).json({message: "algo salió mal al traer el carrito requerido:(", error: err})
+    }
 })
 
-cartsRouter.post('/:cid/product/:pid', async(req, res)=>{
-    const cid = parseInt(req.params['cid']);
-    const pid = parseInt(req.params['pid']);
-    const product = await cartManager.addProductCart(cid, pid);
-    res.send(product);  
+router.post("/", async (req, res) => {
+    try{
+        const response = await addCart()
+        res.json({message: "success. Nuevo carrito creado", data: response})
+    }
+    catch (err) {
+        res.status(500).json({message: "algo salió mal al crear el carrito :(", error: err})
+    }
 })
 
-export default cartsRouter;
+router.post("/:cid/product/:pid", async (req, res) => { 
+    try{
+        const {cid, pid} = req.params
+        const response = await addProductToCart(cid, pid)
+        res.json({message: "success. El producto se agrego correctamente al carrito", data: response})
+    }
+    catch(err) {
+        res.status(500).json({message: "Algo salío mal al agregar el producto al carrito :(", error: err})
+    }
+})
+
+export default router;

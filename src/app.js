@@ -1,43 +1,68 @@
 import express from "express";
+import * as dotenv from "dotenv";
+import __dirname from "./utils.js";
+
+import { engine } from "express-handlebars";
+import exphbs from "express-handlebars";
+
 import cartsRouter from "./routes/carts.js";
 import productsRouter from "./routes/products.js";
-import { engine } from "express-handlebars";
-import { __filename, __dirname } from "./utils.js";
-import viewsRoutes from "./routes/views.router.js";
+import viewsRouter from "./routes/views.router.js";
 import viewsRealTime from "./routes/realTimeProduct.router.js";
-import { createServer } from "http";
+import messagesRouter from "./routes/messages.routes.js";
+
 import { Server } from "socket.io";
-import { guardarProducto, eliminarProducto } from "./services/productUtils.js";
+
+import { addProduct, deleteProduct } from "./dao/dbManagers/productManager.js";
+import { addMessages, getMessages } from "./dao/dbManagers/messageManager.js";
+
+import mongoose from "mongoose";
+
+dotenv.config();
 
 const app = express();
-const httpServer = createServer(app);
 
-// Configurar el middleware para manejar las solicitudes JSON
+const MONGO_URI =
+    process.env.MONGO_URI ||
+    "mongodb+srv://baluxagustina:Theshowmustgoon97666.@cluster0.zhfn8hs.mongodb.net/";
+
+let dbConnect = mongoose.connect(MONGO_URI);
+dbConnect.then(() => {
+    console.log("conexion a la base de datos exitosa");
+}),
+    (error) => {
+        console.log("Error en la conexion a la base de datos", error);
+    };
+
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 
+const hbs = exphbs.create();
 
-// configuro handlebars
+// Registro del helper "prop" en el motor de plantillas para poder renderizar las propiedades de los objetos.
+hbs.handlebars.registerHelper("prop", function (obj, key) {
+    return obj[key];
+});
+
 app.engine("handlebars", engine());
 app.set("view engine", "handlebars");
 app.set("views", `${__dirname}/views`);
 
-// Configurar el directorio estático para archivos públicos
 app.use(express.static("public"));
 
-// Configurar las rutas para las vistas
-app.use("/", viewsRoutes);
 app.use("/realtimeproducts", viewsRealTime);
+app.use("/", viewsRouter);
+app.use("/messages", messagesRouter);
 
-//creo las rutas
 app.use('/api/products', productsRouter);
 app.use('/api/carts', cartsRouter);
 
+
 //Configuro el servidor
 const PORT = 8081;
-httpServer.listen(PORT, () => {
-    console.log(`Servidor en ejecución en http://localhost:${PORT}`);
-});
+const httpServer = app.listen(PORT, () => {
+    console.log(`Escuchando al puerto ${PORT}`);
+    });
 
 // Configuración del lado del servidor
 const io = new Server(httpServer);
@@ -46,24 +71,26 @@ const io = new Server(httpServer);
 io.on("connection", (socket) => {
     console.log("Nuevo cliente conectado");
 
-    // Manejar eventos personalizados
     socket.on("mensaje", (data) => {
         console.log("Mensaje recibido:", data);
 
-      // Enviar una respuesta al cliente
-    socket.emit("respuesta", "Mensaje recibido correctamente");
+        socket.emit("render", "Me estoy comunicando desde el servidor");
+    
+        socket.emit("respuesta", "Mensaje recibido correctamente");
     });
 
-    // Escuchar evento 'agregarProducto' y emitir 'nuevoProductoAgregado'
-    socket.on("agregarProducto", (newProduct) => {
-        console.log("Nuevo producto recibido backend:", newProduct);
-        guardarProducto(newProduct);
-        io.emit("nuevoProductoAgregado", newProduct);
+    socket.on("addProduct", (product) => {
+        addProduct(product);
     });
 
-    socket.on('eliminarProducto',(productId) => {
-        const id = productId;
-        eliminarProducto(id);
+    socket.on("delete-product", (productId) => {
+        const { id } = productId;
+        deleteProduct(id);
+    });
+
+    socket.on("user-message", (obj) => {
+        addMessages(obj);
+        io.emit("new-message", obj)
     });
 
     socket.on("disconnect", () => {

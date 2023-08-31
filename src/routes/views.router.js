@@ -1,13 +1,16 @@
 import { Router } from "express";
-import { __filename, __dirname } from "../utils.js";
-import { obtenerListaDeProductos } from "../services/productUtils.js";
+import { getProducts } from "../dao/dbManagers/productManager.js";
 
-const productRouter = Router();
+const router = Router();
 
-productRouter.get("/", (req, res) => {
-    const products = obtenerListaDeProductos();
-
+router.get("/", async (req, res) => {
+  try {
+    const products = await getProducts();
+    console.log("esto trae products", products);
     res.render("home", { products });
+  } catch (err) {
+    res.render("home", `Ha ocurrido un error ${err}`);
+  }
 });
 
-export default productRouter;
+export default router;
